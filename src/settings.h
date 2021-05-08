@@ -1,5 +1,6 @@
-#define BUTTON_LED 3
+#define BUTTON_LED 9
+#define BUTTON_PIN 10
 
 //APA
-#define NUM_LEDS 60
+#define NUM_LEDS 50
 #define FRAMES_PER_SECOND  120

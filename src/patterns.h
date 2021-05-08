@@ -1,12 +1,12 @@
-#include "settings.h"
-#include <FastLED.h>
+// #include "settings.h"
+// #include <FastLED.h>
 
-void init();
+// void init();
 
-void rainbow();
+// void rainbow();
 
-extern CRGB leds[];
+// extern CRGB leds[];
 
-class BOBOFLamp {
+// class BOBOFLamp {
 
-}
+// }
