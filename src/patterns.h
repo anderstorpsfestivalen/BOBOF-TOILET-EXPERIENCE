@@ -1,10 +1,13 @@
 #include "settings.h"
 #include <FastLED.h>
 
-
-
-class BOBOFLamp {
-    public:
-        CRGB leds[NUM_LEDS];
-        FastLED.addLeds<APA102, 11, 13, BGR>(leds, NUM_LEDS)
+struct State {
+  CRGB *leds[NUM_LEDS];
+  uint8_t hue;
 };
+
+typedef void (*PatternList)(State*);
+
+void solid(State* state);
+void strobe(State* state);
+void turborave(State* state);

@@ -1,17 +1,39 @@
-// #include "patterns.h"
+#include "patterns.h"
 
+void solid(State* state)
+{
+    for (int i = 0; i < NUM_LEDS; i++)
+    {
+        *state->leds[i] = CRGB::White;
+    }
+}
 
-// typedef void (*PatternList[])();
-// PatternList gPatterns = { rainbow };
+void strobe(State* state)
+{
+    static uint8_t strobeCount = 0;
+    for (int i = 0; i < NUM_LEDS; i++)
+    {
 
-// uint8_t gHue = 0;
-// CRGB leds[NUM_LEDS];
+        if (strobeCount == 1)
+        {
+            *state->leds[i] = CRGB::White;
+        }
+        else
+        {
+            *state->leds[i] = CRGB::Black;
+        }
+    }
+    if (strobeCount == 1)
+    {
+        strobeCount = 0;
+    }
+    else
+    {
+        strobeCount = 1;
+    }
+}
 
-// void init() {
-//     EVERY_N_MILLISECONDS( 20 ) { gHue++; } 
-// }
-
-// void rainbow() 
-// {
-//   fill_rainbow( leds, NUM_LEDS, gHue, 7);
-// }
+void turborave(State* state)
+{
+    fill_rainbow(*state->leds, NUM_LEDS, state->hue, 7);
+}

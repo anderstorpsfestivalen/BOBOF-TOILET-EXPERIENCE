@@ -1,3 +1,4 @@
+#pragma once
 #include "settings.h"
 #include <Arduino.h>
 #include <SPI.h>
@@ -5,18 +6,23 @@
 #include "InputDebounce.h"
 #include "patterns.h"
 
-CRGB leds[NUM_LEDS];
 
+PatternList functions[] = { solid, strobe, turborave };
 
 static InputDebounce lightButton;
 int buttonState = 0;
 int lightState = 0;
-int lastPress = millis();
 
+unsigned long lastPress = millis();
+unsigned int currentMode = 0;
+bool cp = false;
+
+State state;
 
 void buttonTest_pressedCallback(uint8_t pinIn) {
 	if (lightState == LOW)
 		{
+			lastPress = millis();
 			lightState = HIGH;
 		}	
 		else
@@ -28,6 +34,19 @@ void buttonTest_pressedCallback(uint8_t pinIn) {
 void releasedDurationCallback(uint8_t pinIn, unsigned long duration) {
 	//Serial.println(duration);
 }
+
+void checkCP() {
+	if (lastPress + TIME_TO_RESET > millis()) {
+		cp = true;
+	} else {
+		cp = false;
+	}
+}
+
+void selectPattern() {
+
+}
+
 
 void setup()
 {
@@ -42,13 +61,14 @@ void setup()
 	lightButton.registerCallbacks(buttonTest_pressedCallback, NULL, NULL, releasedDurationCallback);
 	lightButton.setup(BUTTON_PIN, 20, InputDebounce::PIM_INT_PULL_UP_RES, 0, InputDebounce::ST_NORMALLY_CLOSED);
 
-	FastLED.addLeds<APA102, 11, 13, BGR>(leds, NUM_LEDS);
+	FastLED.addLeds<WS2812B, 11, GRB>(*state.leds, NUM_LEDS);
 
 
 }
 
 void loop()
-{
+{	
+	checkCP();
 
 	lightButton.process(millis());
 	
@@ -65,13 +85,22 @@ void loop()
 	{
 		if (lightState == HIGH)
 		{
-			leds[i] = CRGB::White;
+			if(cp) {
+			 	
+			} else {
+				functions[0](&state);
+			}
+
 		}
 		else
 		{
-			leds[i] = CRGB::Black;
+			*state.leds[i] = CRGB::Black;
 		}
 	}
+
+
 	FastLED.show();
 	FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
+
+
