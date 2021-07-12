@@ -2,7 +2,7 @@
 #include <FastLED.h>
 
 struct State {
-  CRGB *leds[NUM_LEDS];
+  CRGB leds[NUM_LEDS] = {};
   uint8_t hue;
 };
 

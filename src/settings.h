@@ -5,5 +5,5 @@
 #define NUM_LEDS 136
 #define FRAMES_PER_SECOND  120
 
-//Mode
-#define TIME_TO_RESET 120 * 1000
+//Mode (milliseconds)
+#define TIME_TO_RESET 120000

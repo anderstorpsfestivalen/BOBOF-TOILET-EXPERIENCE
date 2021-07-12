@@ -6,6 +6,7 @@
 #include "InputDebounce.h"
 #include "patterns.h"
 
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 PatternList functions[] = { solid, strobe, turborave };
 
@@ -15,6 +16,7 @@ int lightState = 0;
 
 unsigned long lastPress = millis();
 unsigned int currentMode = 0;
+unsigned long patternLength = millis();
 bool cp = false;
 
 State state;
@@ -37,20 +39,43 @@ void releasedDurationCallback(uint8_t pinIn, unsigned long duration) {
 
 void checkCP() {
 	if (lastPress + TIME_TO_RESET > millis()) {
-		if(random(0, 10)  > 7) {
+		unsigned long k = lastPress+TIME_TO_RESET; 
+		Serial.print(lastPress);
+		Serial.print(k);
+		Serial.write("\n");
+		Serial.print(millis());
+		Serial.write("\n\n");
+	//	if(random(0, 10)  > 7) {
 			cp = true;
-		}
+		//}
 	} else {
+		Serial.write("NOT CP \n");
 		cp = false;
 	}
 }
 
 void selectPattern() {
-	if (millis() + (30 * 1000) < lastPress) {
+	if (millis() + (1 * 1000) < lastPress) {
 		solid(&state);
 	} else {
-		//docp
+		if (millis() > patternLength) {
+			currentMode = random(0,ARRAY_SIZE(functions)-1);
+			patternLength = millis() + (random(0,15)*1000);
+		}
+
+		functions[currentMode](&state);
 	}
+}
+
+void buttonLight() {
+	if (lightState == LOW)
+	{
+		analogWrite(BUTTON_LED, 255);
+	}
+	else
+	{
+		analogWrite(BUTTON_LED, 0);
+	}	
 }
 
 
@@ -67,8 +92,7 @@ void setup()
 	lightButton.registerCallbacks(buttonTest_pressedCallback, NULL, NULL, releasedDurationCallback);
 	lightButton.setup(BUTTON_PIN, 20, InputDebounce::PIM_INT_PULL_UP_RES, 0, InputDebounce::ST_NORMALLY_CLOSED);
 
-	FastLED.addLeds<WS2812B, 11, GRB>(*state.leds, NUM_LEDS);
-
+	FastLED.addLeds<WS2812B, 11, GRB>(state.leds, NUM_LEDS);
 
 }
 
@@ -77,22 +101,15 @@ void loop()
 	checkCP();
 
 	lightButton.process(millis());
-	
-	if (lightState == LOW)
-	{
-		analogWrite(BUTTON_LED, 255);
-	}
-	else
-	{
-		analogWrite(BUTTON_LED, 0);
-	}
+	buttonLight();	
+
 
 	for (int i = 0; i < NUM_LEDS; i++)
 	{
 		if (lightState == HIGH)
 		{
 			if(cp) {
-			 	selectPattern();
+				selectPattern();
 			} else {
 				functions[0](&state);
 			}
@@ -100,7 +117,7 @@ void loop()
 		}
 		else
 		{
-			*state.leds[i] = CRGB::Black;
+			state.leds[i] = CRGB::Black;
 		}
 	}
 
