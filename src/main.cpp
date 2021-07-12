@@ -37,14 +37,20 @@ void releasedDurationCallback(uint8_t pinIn, unsigned long duration) {
 
 void checkCP() {
 	if (lastPress + TIME_TO_RESET > millis()) {
-		cp = true;
+		if(random(0, 10)  > 7) {
+			cp = true;
+		}
 	} else {
 		cp = false;
 	}
 }
 
 void selectPattern() {
-
+	if (millis() + (30 * 1000) < lastPress) {
+		solid(&state);
+	} else {
+		//docp
+	}
 }
 
 
@@ -86,7 +92,7 @@ void loop()
 		if (lightState == HIGH)
 		{
 			if(cp) {
-			 	
+			 	selectPattern();
 			} else {
 				functions[0](&state);
 			}
